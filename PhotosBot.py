@@ -62,24 +62,46 @@ def connect_ftp():
     return ftp
 
 
-# Función para verificar o crear una carpeta en FTP
-def create_ftp_folder(create_folder):
+# Función para verificar o crear una carpeta en FTP por organización
+def verify_or_create_ftp_folder(org_slug, folder_name):
     ftp = connect_ftp()
-    ftp.cwd(FTP_PATH)  # Ir a la ruta base
     try:
-        ftp.cwd(create_folder)  # Intentar entrar a la carpeta
+        ftp.cwd(f"{FTP_PATH}/{org_slug}")
     except ftplib.error_perm:
-        ftp.mkd(create_folder)  # Si no existe, crearla
+        ftp.mkd(f"{FTP_PATH}/{org_slug}")
+        ftp.cwd(f"{FTP_PATH}/{org_slug}")
+    try:
+        ftp.cwd(folder_name)
+    except ftplib.error_perm:
+        ftp.mkd(folder_name)
     ftp.quit()
 
 
 # Función para subir archivos a la NAS usando FTP
-def upload_a_ftp(local_name, remote_folder, remote_name):
+def upload_a_ftp(local_name, org_slug, remote_folder, remote_name):
     ftp = connect_ftp()
-    ftp.cwd(f"{FTP_PATH}/{remote_folder}")  # Entrar a la carpeta específica
+    ftp.cwd(f"{FTP_PATH}/{org_slug}/{remote_folder}")  # Entrar a la carpeta específica
     with open(local_name, "rb") as file:
         ftp.storbinary(f"STOR {remote_name}", file)
     ftp.quit()
+
+
+def build_service_folder(service):
+    service_number = service['service_number']
+    client_name = service['client']['first_name']
+    created_data = service['created_at'].split('T')[0]
+    return f"{service_number}-{client_name}-{created_data}"
+
+
+def build_active_service_entry(service):
+    org_slug = service.get('organization_slug') or service.get('employee', {}).get('organization_slug')
+    folder_name = build_service_folder(service)
+    return {
+        "service_id": service['id'],
+        "service_number": service['service_number'],
+        "org_slug": org_slug,
+        "folder": folder_name,
+    }
 
 
 # Comando para asignar el número de servicio y crear la carpeta en FTP
@@ -101,7 +123,6 @@ async def confirmButton(update: Update, context: ContextTypes.DEFAULT_TYPE):
             service_response = requests.patch(f"{API_URL}/service/{service['id']}/", data)
             service_response.raise_for_status()
             service = service_response.json()
-            print(service)
             messageConfirm = createMsgFromJson(service)
             await send_confirm_msg(messageConfirm, GROUP_CHAT_ID)
             await set_service(update, context, service)
@@ -120,18 +141,14 @@ async def confirmButton(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def set_service(update: Update, context: ContextTypes.DEFAULT_TYPE, service):
     chat_id = update.callback_query.message.chat_id
-    service_number = service['service_number']
-    client_name = service['client']['first_name']
-    created_data = service['created_at'].split('T')[0]
-
-    folder_name = f"{service_number}-{client_name}-{created_data}"
-    print(folder_name)
-    active_service[chat_id] = folder_name
+    service_context = build_active_service_entry(service)
+    folder_name = service_context['folder']
+    active_service[chat_id] = service_context
     # Crear la carpeta en el FTP si no existe
-    create_ftp_folder(folder_name)
+    verify_or_create_ftp_folder(service_context['org_slug'], folder_name)
 
     # Botón de finalizar servicio
-    keyboard = [[InlineKeyboardButton("✅ Finalizar Servicio", callback_data=f"finalizar_{folder_name}")]]
+    keyboard = [[InlineKeyboardButton("✅ Finalizar Servicio", callback_data=f"finalizar_{service_context['service_id']}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     # Enviar mensaje de confirmación
@@ -150,8 +167,10 @@ async def manage_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("❌ No tienes un servicio activo.")
         return
 
-    service_folder = active_service[chat_id]
-    service_number = service_folder.split("-")[0]
+    service_context = active_service[chat_id]
+    service_folder = service_context['folder']
+    org_slug = service_context['org_slug']
+    service_id = service_context['service_id']
     archive = await update.message.photo[-1].get_file()
 
     # Crear el directorio file_temp si no existe
@@ -178,14 +197,14 @@ async def manage_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
     from asgiref.sync import sync_to_async
 
     try:
-        service = await sync_to_async(Service.objects.get)(pk=service_number)
+        service = await sync_to_async(Service.objects.get)(pk=service_id)
 
         with open(project_local_path, "rb") as f:
             django_file = File(f)
             # Crear ServiceImage de forma asíncrona
             service_image = await sync_to_async(ServiceImage.objects.create)(
                 service=service,
-                nas_url=f"{FTP_PATH}/{service_folder}"
+                nas_url=f"{FTP_PATH}/{org_slug}/{service_folder}"
             )
             # Guardar el archivo en el campo ImageField de forma asíncrona
             await sync_to_async(service_image.image.save)(image_filename, django_file)
@@ -203,7 +222,7 @@ async def manage_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Subir a la carpeta del servicio en FTP
     try:
-        upload_a_ftp(local_name, service_folder, remote_name)
+        upload_a_ftp(local_name, org_slug, service_folder, remote_name)
         os.remove(local_name)
     except Exception as e:
         logging.error(f"Error uploading image to FTP: {e}")
@@ -212,11 +231,11 @@ async def manage_photos(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Eliminar el archivo local después de subirlo
 
-    keyboard = [[InlineKeyboardButton("✅ Finalizar Servicio", callback_data=f"finalizar_{service_number}")]]
+    keyboard = [[InlineKeyboardButton("✅ Finalizar Servicio", callback_data=f"finalizar_{service_id}")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        f"📸 Imagen guardada en /Telegram/Bot/{service_number}",
+        f"📸 Imagen guardada en /Telegram/Bot/{service_folder}",
         reply_markup=reply_markup
     )
 
@@ -227,19 +246,19 @@ async def request_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
 
     chat_id = query.message.chat_id
-    service_data = query.data.split("_")[1]
-    folder_name = service_data
-    service_number = service_data.split("-")[0]
+    service_id = int(query.data.split("_")[1])
 
     # Verificar que el usuario tenga el servicio asignado
-    if chat_id not in active_service or active_service[chat_id].split("-")[0] != service_number:
+    if chat_id not in active_service or active_service[chat_id]['service_id'] != service_id:
         await query.message.reply_text("❌ No tienes este servicio asignado.")
         return
 
+    service_context = active_service[chat_id]
     # Guardar la información del servicio para cuando envíe el resumen
     waiting_for_summary[chat_id] = {
-        'folder_name': folder_name,
-        'service_number': service_number
+        'folder_name': service_context['folder'],
+        'service_number': service_context['service_number'],
+        'service_id': service_id,
     }
 
     await query.message.reply_text("📝 Envía el resumen del servicio:")
@@ -256,16 +275,17 @@ async def handle_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     service_info = waiting_for_summary[chat_id]
     folder_name = service_info['folder_name']
     service_number = service_info['service_number']
+    service_id = service_info['service_id']
 
     # Remover de la lista de espera
     del waiting_for_summary[chat_id]
 
     try:
-        response = requests.get(f"{API_URL}/service/{service_number}")
+        response = requests.get(f"{API_URL}/service/{service_id}")
         response.raise_for_status()
         service = response.json()
 
-        if chat_id in active_service and active_service[chat_id].split("-")[0] == service_number:
+        if chat_id in active_service and active_service[chat_id]['service_id'] == service_id:
             del active_service[chat_id]
             service['status'] = 2
             service['end_date'] = datetime.datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -277,7 +297,6 @@ async def handle_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
             service_response = requests.patch(f"{API_URL}/service/{service['id']}/", data)
             service_response.raise_for_status()
             service = service_response.json()
-            print(service)
             messageConfirm = createMsgFromJson(service)
             await send_confirm_msg(messageConfirm, GROUP_CHAT_ID)
             await update.message.reply_text(f"✅ Servicio {folder_name} finalizado con resumen.")
@@ -297,17 +316,16 @@ async def handle_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def end_service_old(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     chat_id = query.message.chat_id
-    service_number = query.data.split("_")[1]
-    folder_name = service_number
-    service_number = service_number.split("-")[0]
+    service_id = int(query.data.split("_")[1])
+    folder_name = active_service.get(chat_id, {}).get('folder', str(service_id))
 
 
     try:
-        response = requests.get(f"{API_URL}/service/{service_number}")
+        response = requests.get(f"{API_URL}/service/{service_id}")
         response.raise_for_status()
         service = response.json()
 
-        if chat_id in active_service and active_service[chat_id].split("-")[0] == service_number:
+        if chat_id in active_service and active_service[chat_id]['service_id'] == service_id:
             del active_service[chat_id]
             service['status'] = 2
             service['end_date'] = datetime.datetime.now(local_tz).strftime('%Y-%m-%d %H:%M:%S.%f')
@@ -318,7 +336,6 @@ async def end_service_old(update: Update, context: ContextTypes.DEFAULT_TYPE):
             service_response = requests.patch(f"{API_URL}/service/{service['id']}/", data)
             service_response.raise_for_status()
             service = service_response.json()
-            print(service)
             messageConfirm = createMsgFromJson(service)
             await send_confirm_msg(messageConfirm, GROUP_CHAT_ID)
             await query.message.reply_text(f"✅ Servicio {folder_name} finalizado.")
