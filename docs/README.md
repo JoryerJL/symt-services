@@ -11,6 +11,12 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [decisions.md](./decisions.md) | Decisiones técnicas tomadas con su justificación |
 | [changelog.md](./changelog.md) | Qué se implementó en cada fase y qué probar |
 
+### Documentación por fase
+
+| Archivo | Fase |
+|---------|------|
+| [fase-2-organization.md](./fase-2-organization.md) | Fase 2 — App `organization`: modelo + migraciones |
+
 ## ¿Cómo usar estos docs?
 
 1. **Si eres un agente nuevo:** Lee `implementation-plan.md` primero. Tiene el estado de cada fase con checkboxes. Busca la primera fase sin completar y continúa desde ahí.
