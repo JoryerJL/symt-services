@@ -28,7 +28,7 @@ Si eres un agente retomando este trabajo:
 - [x] Fase 6 — Vistas web: delgadas, usan selectors + services
 - [x] Fase 7 — API (DRF): ViewSets usan selectors + services
 - [x] Fase 8 — Bot central multi-org
-- [ ] Fase 9 — Panel super-admin para gestión de organizaciones
+- [x] Fase 9 — Panel super-admin para gestión de organizaciones
 
 ---
 
@@ -517,7 +517,9 @@ class SuperAdminRequiredMixin(AccessMixin):
 - `GET /organizations/` — listar organizaciones + estado
 - `GET /organizations/create/` — formulario crear org (name, slug auto-generado)
 - `GET /organizations/<slug>/` — detalle: miembros, stats de servicios
+- `GET /organizations/<slug>/edit/` — formulario para editar nombre de la organización
+- `POST /organizations/<slug>/edit/` — actualizar nombre manteniendo el slug
 - `POST /organizations/<slug>/toggle/` — activar/desactivar org
 - `POST /organizations/<slug>/assign-user/` — asignar user existente a la org
 
-**Verificación:** Login con superuser, verificar CRUD completo de organizaciones.
+**Verificación:** Login con superuser, verificar listado, creación, edición de nombre, detalle, toggle y asignación de usuarios.

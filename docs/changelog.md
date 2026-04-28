@@ -2,6 +2,41 @@
 
 Registro de qué se implementó en cada fase y qué verificar antes de continuar a la siguiente.
 
+## Fase 9 — Panel super-admin para gestión de organizaciones
+
+**Fecha:** 2026-04-28
+**Rama:** `feat/fase-9-panel-super-admin`
+
+### Qué se implementó
+
+- Nuevo panel web bajo `/organizations/` protegido por `is_superuser`
+- CRUD operativo de la fase: listar, crear, editar nombre, ver detalle, activar/desactivar y asignar usuarios existentes
+- `SuperAdminRequiredMixin` agregado para centralizar autorización del panel
+- Slug de organización generado automáticamente y con resolución de colisiones
+- El detalle muestra miembros y resumen operativo por organización
+- La edición permite cambiar el nombre sin alterar el `slug`
+- La asignación de usuarios bloquea perfiles ya vinculados a otra organización
+- Se agregaron tests del panel y validaciones de acceso
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+python manage.py test organization employee client service apis
+# Debe pasar con 70 tests OK
+
+python manage.py runserver
+# Verificar manualmente:
+# - /organizations/
+# - /organizations/create/
+# - /organizations/<slug>/
+# - /organizations/<slug>/edit/
+# - toggle de estado
+# - asignación de usuario sin organización
+```
+
+---
+
 ---
 
 ## Fase 8 — Bot central multi-org
