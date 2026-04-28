@@ -21,6 +21,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [fase-5-selectors-service-layer.md](./fase-5-selectors-service-layer.md) | Fase 5 — Selectors + Service Layer |
 | [fase-6-vistas-web.md](./fase-6-vistas-web.md) | Fase 6 — Vistas web: delgadas, usan selectors + services |
 | [fase-7-api-drf.md](./fase-7-api-drf.md) | Fase 7 — API (DRF): ViewSets usan selectors + services |
+| [fase-8-bot-central-multi-org.md](./fase-8-bot-central-multi-org.md) | Fase 8 — Bot central multi-org |
 
 ## ¿Cómo usar estos docs?
 
