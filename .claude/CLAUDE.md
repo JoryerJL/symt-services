@@ -30,6 +30,24 @@ Al terminar cualquier fase del plan SaaS (`docs/implementation-plan.md`), DEBES 
 
 No reportes la fase como terminada sin completar estos cinco pasos.
 
+## Regla: Commits atómicos
+
+Cada commit debe tener UNA sola responsabilidad. Nunca agrupes cambios de distinta naturaleza en un commit.
+
+Orden recomendado dentro de una fase:
+
+1. **Tests** — `test: add X tests for Y`
+2. **Modelos** — `feat: add organization FK to Employee` (uno por modelo si son independientes)
+3. **Migraciones** — `chore: add migration for organization FK in Employee`
+4. **Admin** — `feat: update Employee admin with organization filter`
+5. **Docs** — `docs: add fase-N doc and update changelog`
+
+Reglas:
+- Un commit por modelo si los cambios son independientes entre sí.
+- Tests y su implementación van en commits SEPARADOS (RED primero, GREEN después).
+- Nunca mezcles modelos + migraciones + admin + docs en un solo commit.
+- Si dudas si algo merece su propio commit: sí merece.
+
 ## Plan maestro
 
 El plan está en `docs/implementation-plan.md`. Lee los checkboxes y trabaja siempre desde la primera fase incompleta hacia adelante.
