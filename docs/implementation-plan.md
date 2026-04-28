@@ -22,7 +22,7 @@ Si eres un agente retomando este trabajo:
 
 - [x] Fase 1 — Estructura `docs/`
 - [x] Fase 2 — App `organization`: modelo + migraciones
-- [ ] Fase 3 — UserProfile: vincular User ↔ Organization
+- [x] Fase 3 — UserProfile: vincular User ↔ Organization
 - [ ] Fase 4 — FK `organization` en Employee, Client, Service
 - [ ] Fase 5 — Selectors + Service Layer
 - [ ] Fase 6 — Vistas web: delgadas, usan selectors + services

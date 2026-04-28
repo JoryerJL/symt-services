@@ -1,5 +1,17 @@
 # symt-services — Instrucciones del proyecto
 
+## Regla: Inicio de cada fase SaaS
+
+Antes de implementar cualquier fase, DEBES crear una rama nueva desde `develop`:
+
+```bash
+git checkout develop
+git pull origin develop
+git checkout -b feat/fase-{N}-{nombre-corto}
+```
+
+Trabaja SIEMPRE en esa rama. Nunca commitees cambios de una fase directamente en `develop`.
+
 ## Regla: Fin de cada fase SaaS
 
 Al terminar cualquier fase del plan SaaS (`docs/implementation-plan.md`), DEBES hacer lo siguiente antes de reportar "listo":
