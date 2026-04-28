@@ -9,6 +9,10 @@ def get_services_for_org(*, org: Organization) -> QuerySet:
     return Service.objects.filter(organization=org).order_by('-created_at')
 
 
+def get_service_by_pk(*, service_id: int) -> Service:
+    return Service.objects.get(pk=service_id)
+
+
 def get_service_by_id(*, org: Organization, service_id: int) -> Service:
     return Service.objects.get(organization=org, pk=service_id)
 

@@ -2,34 +2,50 @@ from rest_framework.response import Response
 
 from .serializers import ServiceSerializer, ServiceUpdateSerializer
 from service.models import Service
+from service.selectors import get_service_by_pk
+from service.services import service_update_from_api
 from rest_framework import viewsets
 
+
 class ServiceViewSet(viewsets.ModelViewSet):
-    queryset = Service.objects.all()
+    queryset = Service.objects.none()
     serializer_class = ServiceSerializer
 
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            service = get_service_by_pk(service_id=kwargs['pk'])
+        except Service.DoesNotExist:
+            return Response({"detail": "Not Found"}, status=404)
+
+        return Response(ServiceSerializer(service, context={'request': request}).data)
 
     def update(self, request, *args, **kwargs):
-        self.serializer_class = ServiceUpdateSerializer
-        return super().update(request, *args, **kwargs)
+        try:
+            service = get_service_by_pk(service_id=kwargs['pk'])
+        except Service.DoesNotExist:
+            return Response({"detail": "Not Found"}, status=404)
 
-    def partial_update(self, request, *args, **kwargs):
-        self.serializer_class = ServiceUpdateSerializer
-        summary = request.data.get('summary')
-        service = self.get_object()
-        if summary:
-            if service.summary:
-                service.summary += f"\n{summary}"
-            else:
-                service.summary = summary
-            service.save(update_fields=["summary"])
-
-        data = request.data.copy()
-        if 'summary' in data:
-            data.pop('summary')
-
-        serializer = self.get_serializer(service, data=data, partial=True)
+        serializer = ServiceUpdateSerializer(service, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+
+        return Response(ServiceSerializer(service, context={'request': request}).data)
+
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            service = get_service_by_pk(service_id=kwargs['pk'])
+        except Service.DoesNotExist:
+            return Response({"detail": "Not Found"}, status=404)
+
+        data = request.data.copy()
+        summary = data.pop('summary', None)
+        serializer = ServiceUpdateSerializer(service, data=data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        service = service_update_from_api(
+            service=service,
+            status=serializer.validated_data.get('status'),
+            end_date=serializer.validated_data.get('end_date'),
+            summary=summary,
+        )
 
         return Response(ServiceSerializer(service, context={'request': request}).data)

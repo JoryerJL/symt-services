@@ -20,6 +20,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [fase-4-organization-fk.md](./fase-4-organization-fk.md) | Fase 4 — FK `organization` en Employee, Client, Service |
 | [fase-5-selectors-service-layer.md](./fase-5-selectors-service-layer.md) | Fase 5 — Selectors + Service Layer |
 | [fase-6-vistas-web.md](./fase-6-vistas-web.md) | Fase 6 — Vistas web: delgadas, usan selectors + services |
+| [fase-7-api-drf.md](./fase-7-api-drf.md) | Fase 7 — API (DRF): ViewSets usan selectors + services |
 
 ## ¿Cómo usar estos docs?
 

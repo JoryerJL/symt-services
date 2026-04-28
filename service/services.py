@@ -71,3 +71,32 @@ def service_reactivate(*, service: Service) -> Service:
     service.employee = None
     service.save(update_fields=['status', 'employee'])
     return service
+
+
+def service_update_from_api(
+    *,
+    service: Service,
+    status: int = None,
+    end_date=None,
+    summary: str = None,
+) -> Service:
+    update_fields = []
+
+    if status is not None:
+        service.status = status
+        update_fields.append('status')
+
+    if end_date is not None:
+        service.end_date = end_date
+        update_fields.append('end_date')
+
+    if summary:
+        service.summary = (
+            f"{service.summary}\n{summary}".strip() if service.summary else summary
+        )
+        update_fields.append('summary')
+
+    if update_fields:
+        service.save(update_fields=update_fields)
+
+    return service
