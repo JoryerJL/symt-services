@@ -4,6 +4,30 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 5 — Selectors + Service Layer
+
+**Fecha:** 2026-04-28
+**Rama:** `feat/fase-5-selectors-service-layer`
+
+### Qué se implementó
+
+- 6 archivos nuevos: `selectors.py` y `services.py` en service, employee y client
+- `AdminRequiredMixin` ahora inyecta `request.organization` en cada request
+- Todas las views usan selectors/services — sin queries ORM directas
+- `generate_report_view` convertida a `GenerateReportView` (CBV con org-scoping)
+- `change_employee_status` y `change_client_status` convertidas a CBVs
+- 25 tests nuevos (40 totales, todos pasan)
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+python manage.py test service employee client organization
+# → Ran 40 tests ... OK
+```
+
+---
+
 ## Fase 4 — FK `organization` en Employee, Client, Service
 
 **Fecha:** 2026-04-28  
