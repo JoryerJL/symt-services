@@ -9,6 +9,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [implementation-plan.md](./implementation-plan.md) | Plan maestro de implementación SaaS con fases y estado actual |
 | [architecture.md](./architecture.md) | Arquitectura actual vs objetivo (diagrama + descripción) |
 | [decisions.md](./decisions.md) | Decisiones técnicas tomadas con su justificación |
+| [changelog.md](./changelog.md) | Qué se implementó en cada fase y qué probar |
 
 ## ¿Cómo usar estos docs?
 
