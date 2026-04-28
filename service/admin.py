@@ -1,5 +1,9 @@
 from django.contrib import admin
 
-# Register your models here.
 from .models import Service
-admin.site.register(Service)
+
+
+@admin.register(Service)
+class ServiceAdmin(admin.ModelAdmin):
+    list_display = ('service_number', 'service_title', 'organization', 'client', 'status')
+    list_filter = ('organization', 'status')
