@@ -1,8 +1,14 @@
 from django.db import models
-from common.models import CommonBaseModel
 
-# Create your models here.
+from common.models import CommonBaseModel
+from organization.models import Organization
+
+
 class Employee(CommonBaseModel):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE,
+        related_name='employees', null=True, blank=True
+    )
     first_name = models.CharField("Nombre",max_length=100)
     last_name = models.CharField("Apellido",max_length=100)
     phone_number = models.CharField("Numero telefonico",max_length=100)

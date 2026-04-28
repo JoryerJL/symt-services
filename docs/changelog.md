@@ -4,6 +4,49 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 4 — FK `organization` en Employee, Client, Service
+
+**Fecha:** 2026-04-28  
+**Rama:** `feat/fase-4-organization-fk`
+
+### Qué se implementó
+
+- FK `organization` (null=True) en `Employee`, `Client`, `Service`
+- `Service.service_number`: eliminado `unique=True` global → `unique_together = ('organization', 'service_number')`
+- Admins actualizados: `list_display` y `list_filter` con `organization` en los 3 modelos
+- 3 migraciones generadas y aplicadas: `0004`, `0007`, `0010`
+- 11 tests nuevos en `employee/tests.py`, `client/tests.py`, `service/tests.py` (15 totales, todos pasan)
+
+### Archivos creados/modificados
+
+```
+employee/models.py                              — FK organization
+employee/admin.py                               — list_display/list_filter
+employee/tests.py                               — 3 tests nuevos
+employee/migrations/0004_employee_organization.py
+
+client/models.py                                — FK organization
+client/admin.py                                 — list_display/list_filter
+client/tests.py                                 — 3 tests nuevos
+client/migrations/0007_client_organization.py
+
+service/models.py                               — FK organization + unique_together
+service/admin.py                                — list_display/list_filter
+service/tests.py                                — 5 tests nuevos
+service/migrations/0010_alter_service_options_service_organization_and_more.py
+```
+
+### Qué probar
+
+```bash
+PYTHONPATH=.venv/lib/python3.12/site-packages \
+  /Users/joryerjimenez/.local/share/uv/python/cpython-3.12.12-macos-aarch64-none/bin/python3.12 \
+  manage.py test employee.tests client.tests service.tests organization.tests
+# → Ran 15 tests ... OK
+```
+
+---
+
 ## Fase 3 — UserProfile: vincular User ↔ Organization
 
 **Fecha:** 2026-04-28  

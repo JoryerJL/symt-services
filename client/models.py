@@ -1,5 +1,7 @@
 from django.db import models
+
 from common.models import CommonBaseModel
+from organization.models import Organization
 
 class Address(CommonBaseModel):
     street = models.CharField("Calle",max_length=100)
@@ -15,6 +17,10 @@ class Address(CommonBaseModel):
 
 # Create your models here.
 class Client(CommonBaseModel):
+    organization = models.ForeignKey(
+        Organization, on_delete=models.CASCADE,
+        related_name='clients', null=True, blank=True
+    )
     first_name = models.CharField("Nombre",max_length=100)
     address = models.ForeignKey(Address, on_delete=models.CASCADE, null=True, blank=True)
     company = models.CharField("Empresa",max_length=100, null=True, blank=True)
