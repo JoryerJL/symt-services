@@ -24,7 +24,7 @@ Si eres un agente retomando este trabajo:
 - [x] Fase 2 — App `organization`: modelo + migraciones
 - [x] Fase 3 — UserProfile: vincular User ↔ Organization
 - [x] Fase 4 — FK `organization` en Employee, Client, Service
-- [ ] Fase 5 — Selectors + Service Layer
+- [x] Fase 5 — Selectors + Service Layer
 - [ ] Fase 6 — Vistas web: delgadas, usan selectors + services
 - [ ] Fase 7 — API (DRF): ViewSets usan selectors + services
 - [ ] Fase 8 — Bot central multi-org

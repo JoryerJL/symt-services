@@ -18,6 +18,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [fase-2-organization.md](./fase-2-organization.md) | Fase 2 — App `organization`: modelo + migraciones |
 | [fase-3-userprofile.md](./fase-3-userprofile.md) | Fase 3 — UserProfile: vincular User ↔ Organization |
 | [fase-4-organization-fk.md](./fase-4-organization-fk.md) | Fase 4 — FK `organization` en Employee, Client, Service |
+| [fase-5-selectors-service-layer.md](./fase-5-selectors-service-layer.md) | Fase 5 — Selectors + Service Layer |
 
 ## ¿Cómo usar estos docs?
 
