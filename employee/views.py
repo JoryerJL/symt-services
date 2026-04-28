@@ -1,16 +1,22 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.shortcuts import redirect
+from django.views import View
+from django.views.generic import ListView, CreateView
+
 from common.views import AdminRequiredMixin
+from employee.selectors import get_employees_for_org
+from employee.services import employee_toggle_status
 from .forms import EmployeeForm
 from .models import Employee
 
-# Create your views here.
+
 class EmployeeListView(AdminRequiredMixin, ListView):
-    model = Employee
     template_name = 'employee_list.html'
     context_object_name = 'employees'
-    ordering = ['-created_at']
+
+    def get_queryset(self):
+        return get_employees_for_org(org=self.request.organization)
+
 
 class EmployeeCreateView(AdminRequiredMixin, CreateView):
     model = Employee
@@ -19,36 +25,26 @@ class EmployeeCreateView(AdminRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['employee_form'] = self.form_class(
-                self.request.POST)
-        else:
-            context['employee_form'] = self.form_class()
-
+        context['employee_form'] = EmployeeForm(self.request.POST if self.request.POST else None)
         return context
 
-    def form_valid(self, form):
-        context = self.get_context_data()
-        employee_form = context['employee_form']
-        if employee_form.is_valid():
-            service = employee_form.save(commit=False)
-            service.save()
-            messages.success(self.request, "Empleado registrado con éxito.")
+    def post(self, request, *args, **kwargs):
+        form = EmployeeForm(request.POST)
+        if form.is_valid():
+            employee = form.save(commit=False)
+            employee.organization = request.organization
+            employee.save()
+            messages.success(request, "Empleado registrado con éxito.")
             return redirect('employee_list')
-        else:
-            return self.render_to_response(self.get_context_data(form=form))
-
-    def form_invalid(self, form):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-def change_employee_status(request, pk):
-    employee = Employee.objects.get(pk=pk)
-    if employee.is_active:
-        employee.is_active = False
-        messages.error(request, "El empleado ha sido inactivado con exito.")
-    else:
-        employee.is_active = True
-        messages.success(request, "El empleado ha sido activado con exito.")
-    employee.save()
-    return redirect('employee_list')
+class ChangeEmployeeStatusView(AdminRequiredMixin, View):
+    def post(self, request, pk):
+        employee = Employee.objects.get(organization=request.organization, pk=pk)
+        employee_toggle_status(employee=employee)
+        if employee.is_active:
+            messages.success(request, "El empleado ha sido activado con éxito.")
+        else:
+            messages.error(request, "El empleado ha sido inactivado con éxito.")
+        return redirect('employee_list')
