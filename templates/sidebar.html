@@ -41,6 +41,16 @@
                 <span class="hide-menu">Clientes</span>
               </a>
             </li>
+            {% if request.user.is_superuser %}
+            <li class="sidebar-item">
+              <a class="sidebar-link" href="{% url 'organization_list' %}" aria-expanded="false">
+                <span>
+                  <i class="ti ti-building"></i>
+                </span>
+                <span class="hide-menu">Organizaciones</span>
+              </a>
+            </li>
+            {% endif %}
           </ul>
         </nav>
         <!-- End Sidebar navigation -->

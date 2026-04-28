@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h4 class="mb-1">{{ organization.name }}</h4>
+    <p class="text-muted mb-0">Slug: {{ organization.slug }}</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{% url 'organization_edit' organization.slug %}" class="btn btn-outline-secondary">Editar</a>
+    <form method="post" action="{% url 'organization_toggle' organization.slug %}">
+      {% csrf_token %}
+      {% if organization.is_active %}
+        <button type="submit" class="btn btn-warning">Desactivar</button>
+      {% else %}
+        <button type="submit" class="btn btn-success">Activar</button>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card mb-4">
+      <div class="card-body">
+        <h5 class="card-title">Resumen operativo</h5>
+        <div class="row g-3">
+          <div class="col-md-4"><div class="border rounded p-3"><strong>Total servicios:</strong> {{ stats.total_services }}</div></div>
+          <div class="col-md-4"><div class="border rounded p-3"><strong>Activos/asignados:</strong> {{ stats.active_assigned_services }}</div></div>
+          <div class="col-md-4"><div class="border rounded p-3"><strong>Finalizados:</strong> {{ stats.finished_services }}</div></div>
+          <div class="col-md-6"><div class="border rounded p-3"><strong>Empleados:</strong> {{ stats.employees_count }}</div></div>
+          <div class="col-md-6"><div class="border rounded p-3"><strong>Clientes:</strong> {{ stats.clients_count }}</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Miembros</h5>
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Email</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for member in members %}
+              <tr>
+                <td>{{ member.user.username }}</td>
+                <td>{{ member.user.email|default:'—' }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="2" class="text-center text-muted">Sin miembros asignados.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">Asignar usuario</h5>
+        <form method="post" action="{% url 'organization_assign_user' organization.slug %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="id_user" class="form-label">{{ assign_user_form.user.label }}</label>
+            {{ assign_user_form.user }}
+            {% if assign_user_form.user.errors %}
+              <div class="text-danger small mt-1">{{ assign_user_form.user.errors|join:', ' }}</div>
+            {% endif %}
+          </div>
+          <button type="submit" class="btn btn-primary w-100">Asignar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
