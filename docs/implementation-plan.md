@@ -21,7 +21,7 @@ Si eres un agente retomando este trabajo:
 ## Estado de las fases
 
 - [x] Fase 1 — Estructura `docs/`
-- [ ] Fase 2 — App `organization`: modelo + migraciones
+- [x] Fase 2 — App `organization`: modelo + migraciones
 - [ ] Fase 3 — UserProfile: vincular User ↔ Organization
 - [ ] Fase 4 — FK `organization` en Employee, Client, Service
 - [ ] Fase 5 — Selectors + Service Layer
