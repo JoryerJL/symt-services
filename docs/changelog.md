@@ -4,6 +4,37 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 7 — API (DRF): ViewSets usan selectors + services
+
+**Fecha:** 2026-04-28
+**Rama:** `feat/fase-7-api-drf`
+
+### Qué se implementó
+
+- `EmployeeViewSet` dejó de consultar ORM directo para bootstrap del bot
+- `GET /api/employee/?chat_id=...` y `GET /api/employee/?phone_number=...` ahora usan selectors
+- `PUT /api/employee/<id>/` ahora actualiza `chat_id` vía `employee_update_chat_id`
+- La respuesta del employee API ahora incluye `organization_id` y `organization_slug`
+- `ServiceViewSet` ya no depende de queryset global abierto para retrieve y mueve el append de `summary` al service layer
+- `ClientViewSet` quedó protegido contra listado global accidental
+- Se agregaron tests DRF para employee, service y client
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+python manage.py test apis employee client service
+# Debe pasar con los tests de contrato DRF
+
+python manage.py runserver
+# Verificar manualmente:
+# curl "http://localhost:8000/api/employee/?chat_id=123"
+# curl "http://localhost:8000/api/employee/?phone_number=5551234567"
+# curl "http://localhost:8000/api/service/1/"
+```
+
+---
+
 ## Fase 6 — Vistas web: delgadas, usan selectors + services
 
 **Fecha:** 2026-04-28
