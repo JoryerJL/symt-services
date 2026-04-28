@@ -4,8 +4,8 @@ from django.views import View
 from django.views.generic import ListView, CreateView
 
 from common.views import AdminRequiredMixin
-from client.selectors import get_clients_for_org
-from client.services import client_create, client_toggle_status
+from client.selectors import get_client_by_id, get_clients_for_org
+from client.services import address_create, client_create, client_toggle_status
 from .forms import ClientForm, AddressForm
 from .models import Client
 
@@ -37,7 +37,15 @@ class ClientCreateView(AdminRequiredMixin, CreateView):
         client_form = ClientForm(request.POST)
         address_form = AddressForm(request.POST)
         if client_form.is_valid() and address_form.is_valid():
-            address = address_form.save()
+            address = address_create(
+                street=address_form.cleaned_data['street'],
+                number=address_form.cleaned_data['number'],
+                colony=address_form.cleaned_data['colony'],
+                city=address_form.cleaned_data['city'],
+                state=address_form.cleaned_data['state'],
+                country=address_form.cleaned_data['country'],
+                postal_code=address_form.cleaned_data['postal_code'],
+            )
             client_create(
                 org=request.organization,
                 first_name=client_form.cleaned_data['first_name'],
@@ -53,7 +61,7 @@ class ClientCreateView(AdminRequiredMixin, CreateView):
 
 class ChangeClientStatusView(AdminRequiredMixin, View):
     def post(self, request, pk):
-        client = Client.objects.get(organization=request.organization, pk=pk)
+        client = get_client_by_id(org=request.organization, client_id=pk)
         client_toggle_status(client=client)
         if client.is_active:
             messages.success(request, "El cliente ha sido activado con éxito.")

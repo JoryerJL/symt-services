@@ -1,6 +1,30 @@
 from organization.models import Organization
 
-from .models import Client
+from .models import Address, Client
+
+
+def address_create(
+    *,
+    street: str,
+    number: str,
+    colony: str,
+    city: str,
+    state: str,
+    country: str,
+    postal_code: str,
+) -> Address:
+    address = Address(
+        street=street,
+        number=number,
+        colony=colony,
+        city=city,
+        state=state,
+        country=country,
+        postal_code=postal_code,
+    )
+    address.full_clean()
+    address.save()
+    return address
 
 
 def client_create(

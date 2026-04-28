@@ -2,9 +2,9 @@ from django.test import TestCase
 
 from organization.models import Organization
 
-from .models import Client
+from .models import Address, Client
 from .selectors import get_client_by_id, get_clients_for_org
-from .services import client_create, client_toggle_status
+from .services import address_create, client_create, client_toggle_status
 
 
 class ClientOrganizationTest(TestCase):
@@ -57,6 +57,20 @@ class ClientServicesTest(TestCase):
     def setUp(self):
         self.org = Organization.objects.create(name="Org A", slug="org-a")
         self.client_obj = Client.objects.create(first_name="Juan", organization=self.org, is_active=True)
+
+    def test_address_create_persists_address(self):
+        result = address_create(
+            street="Calle 1",
+            number="123",
+            colony="Centro",
+            city="CDMX",
+            state="CDMX",
+            country="Mexico",
+            postal_code="01000",
+        )
+        self.assertIsInstance(result, Address)
+        self.assertEqual(result.street, "Calle 1")
+        self.assertEqual(Address.objects.count(), 1)
 
     def test_client_create_assigns_organization(self):
         result = client_create(org=self.org, first_name="Nuevo Cliente")
