@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-lg-12 my-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-lg-10 text-center">
+                            <h2>Servicios</h2>
+                        </div>
+                        <div class="col-lg-2 text-end">
+                            <a href="{% url 'services_create' %}" class="btn btn-primary">Crear Servicio</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive w-100">
+                        <table class="table text-nowrap mb-0 align-middle w-100" id="serviceTable">
+                            <thead class="text-dark fs-4">
+                            <tr>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">No Servicio</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Fecha de creación</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Fecha de Asignación</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Fecha de Finalización</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Cliente</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Titulo del servicio</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Asignado a:</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Estado</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Opciones</h6>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for service in services %}
+                                <tr>
+                                    <td class="border-bottom-0 text-center"><h6
+                                            class="fw-semibold mb-0">{{ service.service_number }}</h6></td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-normal">{{ service.created_at|date:"d/m/Y H:i" }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-normal">{% if service.assigment_date %}
+                                            {{ service.assigment_date|date:"d/m/Y H:i" }}{% endif %}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-normal">{% if service.end_date %}
+                                            {{ service.end_date|date:"d/m/Y H:i" }}{% endif %}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-semibold mb-1">{{ service.client.full_name }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <p class="mb-0 fw-normal">{{ service.service_title }}</p>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <p class="mb-0 fw-normal">{{ service.employee.full_name }}</p>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="badge bg-{% if service.status == 0 %}primary{% elif service.status == 3 %}dark{% elif service.status == 1 %}success{% elif service.status == 4 %}secondary{% else %}danger{% endif %} rounded-3 fw-semibold">{{ service.get_status_display }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                    {% if not service.status == 2 and not service.status == 1%}
+                                        {% if not service.employee %}
+                                            <button type="button" class="btn btn-info" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Asignar empleado"
+                                                    onclick="openModal({{ service.id }})"><i
+                                                    class="ti ti-user-search"></i>
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-warning" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Reasignar empleado"
+                                                    onclick="openModal({{ service.id }})"><i
+                                                    class="ti ti-user-search"></i>
+                                            </button>
+                                        {% endif %}
+                                        {% elif service.status == 2 %}
+                                        <a href="{% url 'reactivate_service' service.pk %}" class="btn btn-success" data-bs-toggle="tooltip"
+                                                    data-bs-placement="top" title="Reactivar Servicio">
+                                            <i class="ti ti-refresh"></i>
+                                        </a>
+                                    {% endif %}
+                                        <a href="{% url 'service_detail' service.pk %}" class="btn btn-dark"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" title="Detalle del Servicio">
+                                            <i class="ti ti-info-circle"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="assignEmployeeModal" tabindex="-1" aria-labelledby="assignEmployeeModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignEmployeeModalLabel">Asignar Empleado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignEmployeeForm" method="post" action="{% url 'assign_employee' %}">
+                        {% csrf_token %}
+                        {{ assign_employee_form|crispy }}
+                        <input type="hidden" name="service_id" id="service_id">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="submit" class="btn btn-primary" form="assignEmployeeForm">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script src="{% static 'js/datatable.js' %}"></script>
+        <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+        <script>
+            function openModal(serviceId) {
+                $('#service_id').val(serviceId);
+                var modal = new bootstrap.Modal(document.getElementById('assignEmployeeModal'));
+                modal.show();
+            }
+
+            function submitForm() {
+                var form = $('#assignEmployeeForm');
+                $.ajax({
+                    type: 'POST',
+                    url: "{% url 'assign_employee' %}",
+                    data: form.serialize(),
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('Error: ' + JSON.stringify(response.errors));
+                        }
+                    },
+                    error: function (response) {
+                        alert('An error occurred. Please try again.');
+                    }
+                });
+            }
+        </script>
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/jquery.dataTables.min.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="col-lg-12 my-4">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-lg-10 text-center">
+                            <h2>Empleados</h2>
+                        </div>
+                        <div class="col-lg-2 text-end">
+                            <a href="{% url 'employee_create' %}" class="btn btn-primary">Registrar Empleado</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table text-nowrap mb-0 align-middle" id="serviceTable">
+                            <thead class="text-dark fs-4">
+                            <tr>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">ID</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Nombre</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Numero Telefonico</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Chat ID</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Estado</h6>
+                                </th>
+                                <th class="border-bottom-0 text-center">
+                                    <h6 class="fw-semibold mb-0">Opciones</h6>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for employee in employees %}
+                                <tr>
+                                    <td class="border-bottom-0 text-center"><h6
+                                            class="fw-semibold mb-0">{{ employee.id }}</h6></td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-normal text-center">{{ employee.full_name }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <h6 class="fw-semibold mb-1">{{ employee.phone_number }}</h6>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        {% if employee.chat_id %}
+                                            <p class="mb-0 fw-normal">{{ employee.chat_id }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <span class="badge bg-{% if employee.is_active %}success{% else %}danger{% endif %} rounded-3 fw-semibold">{% if employee.is_active %}Activo{% else %}Inactivo{% endif %}</span>
+                                    </td>
+                                    <td class="border-bottom-0 text-center">
+                                        <a href="{% url 'change_employee_status' employee.id %}"
+                                           class="btn btn-{% if employee.is_active %}danger{% else %}success{% endif %}"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top" title="{% if employee.is_active %}Inactivar{% else %}Activar{% endif %} Empleado">
+                                            <i class="ti ti-{% if employee.is_active %}user-minus{% else %}user-plus{% endif %}"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% block scripts %}
+        <script src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+        <script>
+            $(document).ready(function () {
+                $('#serviceTable').DataTable({
+                    "pageLength": 10,
+                    "lengthMenu": [1, 10, 20, 50, 100],
+                    "order": [[0, 'asc']],
+                    "language": {
+                        "lengthMenu": "Mostrar _MENU_ registros por página",
+                        "zeroRecords": "No se encontraron resultados",
+                        "info": "Mostrando página _PAGE_ de _PAGES_",
+                        "infoEmpty": "No hay registros disponibles",
+                        "infoFiltered": "(filtrado de _MAX_ registros totales)",
+                        "search": "Buscar:",
+                        "paginate": {
+                            "first": "Primero",
+                            "last": "Último",
+                            "next": "Siguiente",
+                            "previous": "Anterior"
+                        }
+                    }
+                });
+            });
+        </script>
+    {% endblock %}
+{% endblock %}

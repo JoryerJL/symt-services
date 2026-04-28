@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% block content %}
+<div class="container-fluid">
+    <div class="card">
+        <div class="card-header">
+            <div class="row">
+                <div class="col-lg-10 text-center">
+                    <h2>Crear Empleado</h2>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="post" enctype="multipart/form-data" onsubmit="this.querySelector('button[type=submit]').disabled = true;">
+                {% csrf_token %}
+                {{ employee_form|crispy }}
+                <button type="submit" class="btn btn-primary">Crear Empleado</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

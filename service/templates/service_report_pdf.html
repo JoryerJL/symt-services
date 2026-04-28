@@ -1,0 +1,521 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Reporte de Servicio Técnico</title>
+<style>
+  /* Configuración de página para WeasyPrint */
+  @page {
+    size: letter;
+    margin: 5mm 10mm 15mm 10mm; /* márgenes reducidos: top right bottom left */
+    @top-center {
+      content: "";
+    }
+    @bottom-center {
+      content: "";
+    }
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    font-size: 8px; /* Reducido de 10px a 8px */
+    color: #000;
+    margin: 0; /* Quitamos márgenes del body */
+    padding: 0;
+    position: relative;
+  }
+
+  /* Marca de agua del logo */
+  .watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-15deg);
+    opacity: 0.08;
+    z-index: -1;
+    width: 300px;
+    height: auto;
+    pointer-events: none;
+  }
+
+  .header-container {
+    position: relative;
+    margin-bottom: 20px; /* Reducido de 30px */
+    min-height: 100px; /* Reducido de 120px */
+  }
+
+  .logo {
+    position: absolute;
+    margin-right: 5px;
+    left: 0;
+    top: 0;
+    width: 140px; /* Reducido de 70px */
+    height: auto;
+  }
+
+  .numero {
+    position: absolute;
+    right: 0;
+    top: 0;
+    background-color: white;
+  }
+
+  .numero table {
+    border-collapse: collapse;
+    margin: 0;
+  }
+
+  .numero .header-cell {
+    background-color: #04c8ad;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+    padding: 6px 20px;
+    border: 1px solid #000;
+    font-size: 9px;
+  }
+
+  .numero .content-cell {
+    background-color: white;
+    padding: 6px 20px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 9px;
+    font-weight: bold;
+  }
+
+  .header {
+    text-align: center;
+    padding: 15px 80px 10px 80px; /* Reducido padding */
+    border-bottom: 3px solid #04c8ad;
+  }
+
+  .header h1 {
+    font-size: 15px; /* Reducido de 14px */
+    color: #2581be;
+    margin: 0 0 6px 0; /* Reducido margen */
+    line-height: 1.2;
+  }
+
+  .header h2 {
+    font-size: 13px; /* Reducido de 12px */
+    color: #258ebe;
+    margin: 0 0 6px 0; /* Reducido margen */
+  }
+
+  .header p {
+    font-size: 7px; /* Reducido de 9px */
+    margin: 0;
+    line-height: 1.3;
+  }
+
+  .intro-text {
+    margin: 15px 0; /* Reducido de 20px */
+    font-size: 8px;
+  }
+
+  /* Tabla principal de información del cliente */
+  .main-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #000;
+    margin: 10px 0; /* Reducido de 15px */
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Encabezados con fondo turquesa */
+  .header-cell {
+    background-color: #04c8ad;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+    padding: 8px; /* Reducido de 10px */
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-left: none;
+    border-right: none;
+    font-size: 9px; /* Reducido de 11px */
+  }
+
+  /* Celdas de contenido */
+  .content-cell {
+    background-color: white;
+    padding: 8px; /* Reducido de 10px */
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-left: none;
+    border-right: none;
+    text-align: center;
+    font-size: 9px; /* Reducido de 10px */
+    line-height: 1.3;
+  }
+
+  /* Columnas de primera sección - 4 columnas iguales */
+  .col-25 {
+    width: 25%;
+  }
+
+  /* Columnas de segunda sección */
+  .col-40 {
+    width: 40%;
+  }
+
+  .col-35 {
+    width: 35%;
+  }
+
+  .col-20 {
+    width: 20%;
+  }
+
+  /* Diagnóstico especial */
+  .diagnostico-header {
+    background-color: #04c8ad;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+    padding: 10px; /* Reducido de 12px */
+    border: 1px solid #000;
+    font-size: 10px; /* Reducido de 12px */
+  }
+
+  .diagnostico-content {
+    background-color: white;
+    padding: 12px; /* Reducido de 15px */
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 8px; /* Reducido de 10px */
+    line-height: 1.4;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0; /* Reducido de 15px */
+    position: relative;
+    z-index: 1;
+  }
+
+  td, th {
+    border: 1px solid #000;
+    padding: 6px; /* Reducido de 8px */
+    vertical-align: top;
+  }
+
+  .section-title {
+    background-color: #04c8ad;
+    color: #000;
+    font-weight: bold;
+    text-align: center;
+    padding: 6px; /* Reducido de 8px */
+    font-size: 9px; /* Reducido de 11px */
+  }
+
+  .fotografias {
+    margin: 15px 0; /* Reducido de 20px */
+    position: relative;
+    z-index: 1;
+  }
+
+  .imagenes {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid #000;
+    min-height: 180px; /* Reducido de 200px */
+    gap: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Para páginas adicionales con más imágenes */
+  .imagenes-adicionales {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border: 1px solid #000;
+    min-height: 400px; /* Más alto para páginas adicionales */
+    gap: 1px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .imagenes div, .imagenes-adicionales div {
+    border: 1px solid #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 130px; /* Reducido de 150px */
+    background-color: #f8f9fa;
+  }
+
+  .imagenes img, .imagenes-adicionales img {
+    max-width: 100%;
+    max-height: 120px; /* Reducido de 140px */
+    object-fit: contain;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .imagenes .placeholder, .imagenes-adicionales .placeholder {
+    color: #666;
+    font-size: 7px; /* Reducido de 9px */
+    text-align: center;
+  }
+
+  .responsable {
+    margin: 15px 0; /* Reducido de 20px */
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .responsable-table-container {
+    width: 65%;
+    flex-shrink: 0;
+  }
+
+  .responsable table {
+    width: 100%;
+    margin: 0;
+  }
+
+  .responsable .qr-container {
+    width: 120px;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+    flex-shrink: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    padding-top: 10px;
+  }
+
+  .responsable .qr-container img {
+    width: 120px !important;
+    height: 120px !important;
+    max-width: 120px !important;
+    max-height: 120px !important;
+    display: block;
+  }
+
+  .footer-container {
+    margin-top: 20px; /* Reducido de 30px */
+    position: relative;
+  }
+
+  .footer {
+    text-align: center;
+    font-size: 7px; /* Reducido de 9px */
+    border-top: 2px solid #04c8ad;
+    padding-top: 8px; /* Reducido de 10px */
+    margin-bottom: 8px; /* Reducido de 10px */
+    line-height: 1.3;
+  }
+
+  .content-section {
+    margin: 5px 0; /* Reducido de 25px */
+  }
+
+  strong {
+    font-weight: bold;
+  }
+
+  /* Optimizaciones específicas para WeasyPrint */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Evitar saltos de página en elementos críticos */
+  .main-table, .fotografias {
+    page-break-inside: avoid;
+  }
+
+  /* Forzar salto de página */
+  .page-break {
+    page-break-before: always;
+  }
+
+  /* Páginas adicionales simplificadas */
+  .additional-page {
+    margin-top: 0;
+  }
+
+</style>
+</head>
+<body>
+
+<!-- Marca de agua del logo -->
+<img src="file://{{ logo_path }}" alt="Marca de agua" class="watermark">
+
+{% for block in image_blocks %}
+  {% if block.is_first_page %}
+    <!-- PRIMERA PÁGINA COMPLETA -->
+    <div class="header-container">
+      <img src="file://{{ logo_path }}" alt="Logo SYMT" class="logo">
+
+      <div class="numero">
+        <table>
+          <tr>
+            <td class="header-cell">No.</td>
+          </tr>
+          <tr>
+            <td class="content-cell"> <strong>{{ service.service_number|default:"N/A" }}</strong></td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="header">
+          <div style="margin-left: 15px">
+              <h1>SERVICIOS Y MANTENIMIENTOS TECNOLÓGICOS DE MÉXICO</h1>
+              <h2>Reporte de Servicio Técnico</h2>
+              <p style="font-size: 9px">Cámaras de vigilancia, GPS vehicular, Reparación y Venta de equipos de cómputo,<br>
+                  Redes, Cerco eléctrico, Control de Acceso Vehicular y Peatonal, Desarrollo de Software,<br>
+                  Sistemas de control de fraccionamientos y estacionamientos.</p>
+          </div>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <!-- TABLA PRINCIPAL DE INFORMACIÓN DEL CLIENTE -->
+      <table class="main-table">
+        <!-- Primera sección: 4 columnas iguales -->
+        <tr>
+          <td class="header-cell col-25">Cliente</td>
+          <td class="header-cell col-20">Nombre del Solicitante</td>
+          <td class="header-cell col-20">Vía de Comunicación</td>
+          <td class="header-cell col-30">Fecha de Solicitud</td>
+        </tr>
+        <tr>
+          <td class="content-cell">{{ client.company|default:client.first_name }}</td>
+          <td class="content-cell">{{ client.responsible|default:client.first_name }}</td>
+          <td class="content-cell"><strong>{{ service.request_methods }}</strong></td>
+          <td class="content-cell">{{ service.created_at|date:"d/m/Y"|default:"Por definir" }}</td>
+        </tr>
+
+        <!-- Segunda sección: 3 columnas con distribución específica -->
+        <tr>
+          <td class="header-cell col-40">Descripción de Solicitud</td>
+          <td class="header-cell col-25" colspan="2">Dirección</td>
+          <td class="header-cell col-35">Fecha de Atención</td>
+        </tr>
+        <tr>
+          <td class="content-cell">{{ service.description|default:"Servicio técnico" }}</td>
+          <td class="content-cell" colspan="2">{{ client.address|default:"No especificada" }}</td>
+          <td class="content-cell">{{ service.end_date|date:"d/m/Y"|default:"Por definir" }}</td>
+        </tr>
+
+        <!-- Tercera sección: Diagnóstico -->
+        <tr>
+          <td class="diagnostico-header" colspan="4">TRABAJOS REALIZADOS</td>
+        </tr>
+        <tr>
+          <td class="diagnostico-content" colspan="4">{{ service.summary|default:"Pendiente de completar por el técnico asignado." }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="fotografias content-section">
+      <div class="section-title">FOTOGRAFÍAS</div>
+      <div class="imagenes">
+        {% for image_data in block.images %}
+          <div>
+            {% if image_data.exists and image_data.absolute_path %}
+              <img src="{{ image_data.absolute_path }}" alt="Imagen {{ forloop.counter }}">
+            {% else %}
+              <div class="placeholder">
+                Imagen {{ forloop.counter }}<br>
+                No disponible
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="responsable content-section">
+        <div class="responsable-table-container">
+            <table>
+                <tr class="section-title">
+                    <td colspan="2">RESPONSABLE DEL SERVICIO</td>
+                </tr>
+                <tr>
+                    <td style="width:30%;">
+                        <strong>Técnico Asignado:</strong>
+                    </td>
+                    <td>
+                        {{ employee.full_name|default:"Por asignar" }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="qr-container">
+            <img src="file://{{ qr_path }}" alt="Código QR">
+        </div>
+    </div>
+
+    <div class="footer-container">
+      <div class="footer">
+        <strong>SERVICIOS Y MANTENIMIENTOS TECNOLÓGICOS DE MÉXICO</strong><br>
+        Calle Agustin de Iturbide 303 A Col. Tamulté de las Barrancas. Villahermosa, Tabasco. C. P. 86150<br>
+        Cel. 9933-95-53-40 | email: soporte@symt.mx<br>
+      </div>
+    </div>
+
+  {% else %}
+    <!-- PÁGINAS ADICIONALES (SOLO HEADER Y FOTOGRAFÍAS) -->
+    <div class="page-break additional-page">
+      <div class="header-container">
+        <img src="file://{{ logo_path }}" alt="Logo SYMT" class="logo">
+
+        <div class="numero">
+          <table>
+            <tr>
+              <td class="header-cell">No.</td>
+            </tr>
+            <tr>
+              <td class="content-cell"> <strong>{{ service.service_number|default:"N/A" }}</strong></td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="header">
+            <div style="margin-left: 15px">
+                <h1>SERVICIOS Y MANTENIMIENTOS TECNOLÓGICOS DE MÉXICO</h1>
+                <h2>Reporte de Servicio Técnico - Fotografías Adicionales</h2>
+                <p style="font-size: 9px">Cámaras de vigilancia, GPS vehicular, Reparación y Venta de equipos de cómputo,<br>
+                    Redes, Cerco eléctrico, Control de Acceso Vehicular y Peatonal, Desarrollo de Software,<br>
+                    Sistemas de control de fraccionamientos y estacionamientos.</p>
+            </div>
+        </div>
+      </div>
+
+      <div class="fotografias content-section">
+        <div class="section-title">FOTOGRAFÍAS (CONTINUACIÓN)</div>
+        <div class="imagenes-adicionales">
+          {% for image_data in block.images %}
+            <div>
+              {% if image_data.exists and image_data.absolute_path %}
+                <img src="{{ image_data.absolute_path }}" alt="Imagen {{ forloop.counter }}">
+              {% else %}
+                <div class="placeholder">
+                  Imagen {{ forloop.counter }}<br>
+                  No disponible
+                </div>
+              {% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endfor %}
+
+</body>
+</html>

@@ -1,0 +1,21 @@
+{% load static%}
+    <div class="card">
+        <div class="card-body d-flex align-items-center">
+            <!-- Imagen de perfil -->
+            <img src="https://picsum.photos/200/300.jpg" class="rounded-circle me-3" width="80" height="80" alt="Perfil">
+
+            <!-- Información del usuario -->
+            <div class="flex-grow-1">
+                <h4 class="m-0 text-dark">{{ service.service_title }}
+                    <a href="#" class="btn btn-sm" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar">
+                        <i class="ti ti-pencil" style="font-size: 1.5em;"></i>
+                    </a>
+                    <a href="#" class="btn btn-sm" data-bs-toggle="modal" data-bs-target="#imageSelectionModal" data-bs-placement="top" title="Generar Reporte">
+                        <i class="ti ti-file-text" style="font-size: 1.5em; color: #dc3545;"></i>
+                    </a>
+                </h4>
+                <p class="text-muted mb-1">ID: {{ service.service_number }}</p>
+                <span class="badge bg-primary-subtle text-primary px-2 py-1">Creado el: {{ service.created_at| date:"Y-M-d"}}</span>
+            </div>
+        </div>
+    </div>
