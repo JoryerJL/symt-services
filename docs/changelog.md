@@ -4,6 +4,29 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 6 — Vistas web: delgadas, usan selectors + services
+
+**Fecha:** 2026-04-28
+**Rama:** `develop`
+
+### Qué se implementó
+
+- `employee/views.py` ya no hace `form.save(commit=False)` ni `Employee.objects.get(...)`
+- `client/views.py` ya no hace `address_form.save()` ni `Client.objects.get(...)`
+- Se agregaron `employee_create` y `get_employee_by_id` para completar el patrón en employee
+- Se agregó `address_create` para mover la creación de `Address` fuera de la view
+- La documentación quedó alineada: Fase 6 ahora sí está cerrada según código real
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+python manage.py test employee client
+# Debe pasar con los nuevos tests de selectors/services
+```
+
+---
+
 ## Fase 5 — Selectors + Service Layer
 
 **Fecha:** 2026-04-28
