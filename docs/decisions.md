@@ -97,3 +97,13 @@ Este archivo registra las decisiones de diseño tomadas para la conversión a Sa
 **Por qué no extender User:** `OneToOneField` es el patrón Django idiomático. Permite reusar `AUTH_USER_MODEL` sin modificarlo.
 
 **Acceso en views:** `request.user.profile.organization` (expuesto como `request.organization` desde `AdminRequiredMixin`).
+
+---
+
+## D-009: Estado del bot — Guardar `service_id` y `org_slug`
+
+**Decisión:** El estado en memoria del bot guarda `service_id`, `service_number`, `org_slug` y `folder` para cada chat activo.
+
+**Por qué:** Después de D-007, `service_number` ya NO es globalmente único. Si el bot usa solo el número de servicio para consultar la API o guardar imágenes, puede mezclar organizaciones distintas. `service_id` resuelve la identidad exacta y `org_slug` permite construir el path FTP aislado por organización.
+
+**Implicación:** El bot finaliza servicios por `service_id`, y `ServiceImage.nas_url` debe incluir `{FTP_PATH}/{org_slug}/{service_folder}`.

@@ -4,6 +4,43 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 8 — Bot central multi-org
+
+**Fecha:** 2026-04-28
+**Rama:** `feat/fase-8-bot-central-multi-org`
+
+### Qué se implementó
+
+- `PhotosBot.py` ahora conserva contexto multi-org por chat activo: `service_id`, `service_number`, `org_slug` y `folder`
+- El bot dejó de usar `service_number` como identificador global para consultar y finalizar servicios; ahora usa `service_id`
+- La subida FTP ahora entra a `{FTP_PATH}/{org_slug}/{service_folder}`
+- `ServiceImage.nas_url` ahora incluye el prefijo de organización
+- Se agregaron tests unitarios para el flujo crítico del bot y helpers FTP
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+python manage.py test service.test_photos_bot apis service
+# Debe pasar con 33 tests OK
+
+# Verificación manual del flujo del bot:
+# 1. Inicia Django API
+python manage.py runserver
+
+# 2. En otra terminal, ejecuta el bot
+python PhotosBot.py
+
+# 3. Desde Telegram:
+#    - confirma un servicio
+#    - sube una foto
+#    - finaliza el servicio con resumen
+# 4. Verifica en FTP/NAS que la imagen quedó en:
+#    {FTP_PATH}/{org_slug}/{service_number}-{cliente}-{fecha}/
+```
+
+---
+
 ## Fase 7 — API (DRF): ViewSets usan selectors + services
 
 **Fecha:** 2026-04-28
