@@ -4,6 +4,46 @@ Registro de qué se implementó en cada fase y qué verificar antes de continuar
 
 ---
 
+## Fase 3 — UserProfile: vincular User ↔ Organization
+
+**Fecha:** 2026-04-28  
+**Rama:** `develop`
+
+### Qué se implementó
+
+- Modelo `UserProfile` en `organization/models.py`:
+  - `user` — OneToOneField → `AUTH_USER_MODEL` (related_name `profile`)
+  - `organization` — ForeignKey → `Organization` (related_name `members`)
+  - `__str__` retorna `"username — org_name"`
+- `organization/admin.py` actualizado: `UserProfileInline` inyectado en `CustomUserAdmin`
+- Migración `0002_userprofile` generada y aplicada
+- Tests creados en `organization/tests.py` (4 tests, todos pasan)
+
+### Archivos creados/modificados
+
+```
+organization/models.py                      — UserProfile agregado
+organization/admin.py                       — CustomUserAdmin + UserProfileInline
+organization/tests.py                       — creado nuevo (4 tests)
+organization/migrations/0002_userprofile.py — migración nueva
+```
+
+### Qué probar
+
+```bash
+source .venv/bin/activate
+
+# Tests
+python manage.py test organization
+# → Ran 4 tests ... OK
+
+# Admin
+python manage.py runserver
+# /admin/ → Usuarios → editar user → ver inline "User profile"
+```
+
+---
+
 ## Fase 2 — App `organization`: modelo + migraciones
 
 **Fecha:** 2026-04-28  

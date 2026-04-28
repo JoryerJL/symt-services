@@ -16,6 +16,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | Archivo | Fase |
 |---------|------|
 | [fase-2-organization.md](./fase-2-organization.md) | Fase 2 — App `organization`: modelo + migraciones |
+| [fase-3-userprofile.md](./fase-3-userprofile.md) | Fase 3 — UserProfile: vincular User ↔ Organization |
 
 ## ¿Cómo usar estos docs?
 
