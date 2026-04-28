@@ -4,8 +4,8 @@ from django.views import View
 from django.views.generic import ListView, CreateView
 
 from common.views import AdminRequiredMixin
-from employee.selectors import get_employees_for_org
-from employee.services import employee_toggle_status
+from employee.selectors import get_employee_by_id, get_employees_for_org
+from employee.services import employee_create, employee_toggle_status
 from .forms import EmployeeForm
 from .models import Employee
 
@@ -31,9 +31,13 @@ class EmployeeCreateView(AdminRequiredMixin, CreateView):
     def post(self, request, *args, **kwargs):
         form = EmployeeForm(request.POST)
         if form.is_valid():
-            employee = form.save(commit=False)
-            employee.organization = request.organization
-            employee.save()
+            employee_create(
+                org=request.organization,
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                phone_number=form.cleaned_data['phone_number'],
+                chat_id=form.cleaned_data.get('chat_id'),
+            )
             messages.success(request, "Empleado registrado con éxito.")
             return redirect('employee_list')
         return self.render_to_response(self.get_context_data(form=form))
@@ -41,7 +45,7 @@ class EmployeeCreateView(AdminRequiredMixin, CreateView):
 
 class ChangeEmployeeStatusView(AdminRequiredMixin, View):
     def post(self, request, pk):
-        employee = Employee.objects.get(organization=request.organization, pk=pk)
+        employee = get_employee_by_id(org=request.organization, employee_id=pk)
         employee_toggle_status(employee=employee)
         if employee.is_active:
             messages.success(request, "El empleado ha sido activado con éxito.")

@@ -13,5 +13,9 @@ def get_employee_by_phone(*, phone_number: str) -> Employee:
     return Employee.objects.get(phone_number=phone_number)
 
 
+def get_employee_by_id(*, org: Organization, employee_id: int) -> Employee:
+    return Employee.objects.get(organization=org, pk=employee_id)
+
+
 def get_employees_for_org(*, org: Organization) -> QuerySet:
     return Employee.objects.filter(organization=org, is_active=True)

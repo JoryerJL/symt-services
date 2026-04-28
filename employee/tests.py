@@ -3,8 +3,13 @@ from django.test import TestCase
 from organization.models import Organization
 
 from .models import Employee
-from .selectors import get_employee_by_chat_id, get_employee_by_phone, get_employees_for_org
-from .services import employee_toggle_status, employee_update_chat_id
+from .selectors import (
+    get_employee_by_chat_id,
+    get_employee_by_id,
+    get_employee_by_phone,
+    get_employees_for_org,
+)
+from .services import employee_create, employee_toggle_status, employee_update_chat_id
 
 
 class EmployeeOrganizationTest(TestCase):
@@ -62,6 +67,14 @@ class EmployeeSelectorsTest(TestCase):
         result = get_employee_by_phone(phone_number="5551234567")
         self.assertEqual(result, self.employee)
 
+    def test_get_employee_by_id_returns_correct_employee_for_org(self):
+        result = get_employee_by_id(org=self.org, employee_id=self.employee.pk)
+        self.assertEqual(result, self.employee)
+
+    def test_get_employee_by_id_raises_if_wrong_org(self):
+        with self.assertRaises(Exception):
+            get_employee_by_id(org=self.org, employee_id=self.other_org.pk)
+
     def test_get_employees_for_org_returns_only_active_in_org(self):
         qs = get_employees_for_org(org=self.org)
         self.assertIn(self.employee, qs)
@@ -82,6 +95,20 @@ class EmployeeServicesTest(TestCase):
         self.assertEqual(result.chat_id, "new_chat_123")
         self.employee.refresh_from_db()
         self.assertEqual(self.employee.chat_id, "new_chat_123")
+
+    def test_employee_create_assigns_organization(self):
+        result = employee_create(
+            org=self.org,
+            first_name="Nuevo",
+            last_name="Empleado",
+            phone_number="5551112233",
+            chat_id="chat-new",
+        )
+        self.assertEqual(result.organization, self.org)
+        self.assertEqual(result.first_name, "Nuevo")
+        self.assertEqual(result.last_name, "Empleado")
+        self.assertEqual(result.phone_number, "5551112233")
+        self.assertEqual(result.chat_id, "chat-new")
 
     def test_employee_toggle_status_deactivates_active_employee(self):
         result = employee_toggle_status(employee=self.employee)
