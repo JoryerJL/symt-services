@@ -107,3 +107,21 @@ Este archivo registra las decisiones de diseño tomadas para la conversión a Sa
 **Por qué:** Después de D-007, `service_number` ya NO es globalmente único. Si el bot usa solo el número de servicio para consultar la API o guardar imágenes, puede mezclar organizaciones distintas. `service_id` resuelve la identidad exacta y `org_slug` permite construir el path FTP aislado por organización.
 
 **Implicación:** El bot finaliza servicios por `service_id`, y `ServiceImage.nas_url` debe incluir `{FTP_PATH}/{org_slug}/{service_folder}`.
+
+
+## D-010: Panel super-admin — asignación solo a usuarios sin organización
+
+**Decisión:** El panel super-admin permite asignar usuarios existentes solo si aún NO tienen `UserProfile`. No se permite reasignar usuarios entre organizaciones desde esta fase.
+
+**Por qué:** Reduce el riesgo de mover miembros entre tenants por error desde un panel operativo simple. La reasignación implica una decisión administrativa más delicada y queda fuera del MVP de esta fase.
+
+**Implicación:** El formulario de asignación lista únicamente usuarios sin organización y, si se intenta forzar un usuario ya vinculado, la operación se rechaza con mensaje claro.
+
+
+## D-011: Edición de organizaciones — el slug permanece estable
+
+**Decisión:** La edición de organización en el panel super-admin permite cambiar solo el `name`. El `slug` NO se regenera ni se edita desde UI.
+
+**Por qué:** El slug ya participa en rutas y paths operativos; cambiarlo rompe referencias y contradice la decisión de usarlo como identificador estable.
+
+**Implicación:** La vista de edición muestra el slug como referencia de solo lectura y la escritura se limita al nombre.

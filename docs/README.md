@@ -22,6 +22,7 @@ Este directorio contiene la documentación técnica del proyecto para que cualqu
 | [fase-6-vistas-web.md](./fase-6-vistas-web.md) | Fase 6 — Vistas web: delgadas, usan selectors + services |
 | [fase-7-api-drf.md](./fase-7-api-drf.md) | Fase 7 — API (DRF): ViewSets usan selectors + services |
 | [fase-8-bot-central-multi-org.md](./fase-8-bot-central-multi-org.md) | Fase 8 — Bot central multi-org |
+| [fase-9-panel-super-admin.md](./fase-9-panel-super-admin.md) | Fase 9 — Panel super-admin para gestión de organizaciones |
 
 ## ¿Cómo usar estos docs?
 

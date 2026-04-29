@@ -30,6 +30,7 @@ urlpatterns = [
     path('', include('service.urls')),
     path('employee/', include('employee.urls')),
     path('client/', include('client.urls')),
+    path('organizations/', include('organization.urls')),
 ]
 
 urlpatterns +=[

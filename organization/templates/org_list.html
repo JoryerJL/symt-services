@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+  <div class="card-body">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h4 class="card-title mb-1">Organizaciones</h4>
+        <p class="text-muted mb-0">Panel exclusivo para super-admin.</p>
+      </div>
+      <a href="{% url 'organization_create' %}" class="btn btn-primary">Nueva organización</a>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table align-middle">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Slug</th>
+            <th>Estado</th>
+            <th>Miembros</th>
+            <th>Empleados</th>
+            <th>Clientes</th>
+            <th>Servicios</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for organization in organizations %}
+          <tr>
+            <td>{{ organization.name }}</td>
+            <td>{{ organization.slug }}</td>
+            <td>
+              {% if organization.is_active %}
+                <span class="badge bg-success">Activa</span>
+              {% else %}
+                <span class="badge bg-danger">Inactiva</span>
+              {% endif %}
+            </td>
+            <td>{{ organization.members_count }}</td>
+            <td>{{ organization.employees_count }}</td>
+            <td>{{ organization.clients_count }}</td>
+            <td>{{ organization.services_count }}</td>
+            <td class="text-end">
+              <div class="d-flex justify-content-end gap-2">
+                <a href="{% url 'organization_edit' organization.slug %}" class="btn btn-sm btn-outline-secondary">Editar</a>
+                <a href="{% url 'organization_detail' organization.slug %}" class="btn btn-sm btn-outline-primary">Ver detalle</a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8" class="text-center text-muted">No hay organizaciones registradas.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
